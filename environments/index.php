@@ -32,8 +32,7 @@ return [
     'Development' => [
         'path' => 'dev',
         'setWritable' => [
-            'backend/runtime',
-            'backend/web/assets',
+            'api/runtime',
             'frontend/runtime',
             'frontend/web/assets',
         ],
@@ -42,15 +41,14 @@ return [
             'yii_test',
         ],
         'setCookieValidationKey' => [
-            'backend/config/main-local.php',
+            'api/config/main-local.php',
             'frontend/config/main-local.php',
         ],
     ],
     'Production' => [
         'path' => 'prod',
         'setWritable' => [
-            'backend/runtime',
-            'backend/web/assets',
+            'api/runtime',
             'frontend/runtime',
             'frontend/web/assets',
         ],
@@ -58,7 +56,7 @@ return [
             'yii',
         ],
         'setCookieValidationKey' => [
-            'backend/config/main-local.php',
+            'api/config/main-local.php',
             'frontend/config/main-local.php',
         ],
     ],
