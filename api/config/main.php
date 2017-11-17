@@ -64,6 +64,8 @@ return [
                         [
                             'GET <name\w+>' => 'search-by-name',
                             'GET category/<name\w+>' => 'search-by-category-name',
+                            'GET tag/<tag>' => 'search-by-tag',
+                            'GET category/<name\w+>/tag/<tag\w+>' => 'search-by-category-and-tag',
                         ],
                 ],
             ],
