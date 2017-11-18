@@ -9,6 +9,14 @@ use yii\web\Response;
 class RestController extends Controller
 {
     /**
+     * @return string
+     */
+    public function actionIndex()
+    {
+        return 'api';
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function behaviors()

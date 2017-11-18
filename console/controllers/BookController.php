@@ -2,9 +2,9 @@
 
 namespace console\controllers;
 
-use api\modules\v1\models\Book;
-use api\modules\v1\models\Category;
-use api\modules\v1\models\Tag;
+use common\models\Book;
+use common\models\Category;
+use common\models\Tag;
 use PhpAmqpLib\Message\AMQPMessage;
 use yii\console\Controller;
 
@@ -44,49 +44,54 @@ class BookController extends Controller
     }
 
     /**
-     * @param int $bookId
-     * @param int $categoryId
+     * @param string $oldCategoryName
+     * @param string $newCategoryName
      */
-    public function actionReplace(int $bookId, int $categoryId)
+    public function actionReplace(string $oldCategoryName, string $newCategoryName)
     {
-        \Yii::$app->replaceBookQueue->publisher(['bookId' => $bookId, 'categoryId' => $categoryId]);
+        \Yii::$app->replaceBookQueue->publisher(['oldCategoryName' => $oldCategoryName, 'newCategoryName' => $newCategoryName]);
     }
-    
+
     public function actionConsumeReplace()
     {
         \Yii::$app->replaceBookQueue->consume(function (AMQPMessage $message) {
             $data = json_decode($message->body);
 
-            if (!is_object($data) || !isset($data->bookId) || !isset($data->categoryId)) {
-                echo '[*] something wrong look at line 60 in console/controllers/BookController ' . $data->categoryId, "\n";
+            if (!is_object($data) || !isset($data->oldCategoryName) || !isset($data->newCategoryName)) {
+                echo '[*] something wrong look at line 60 in console/controllers/BookController ', "\n";
                 
                 return false;
             }
-
-            $book = Book::findOne($data->bookId);
-            $category = Category::findOne($data->categoryId);
+            /** @var  $books Book[] */
+            $books = Book::find()
+                ->joinWith('category')
+                ->where(['category.name' => $data->oldCategoryName])
+                ->all();
+            $category = Category::findOne(['name' => $data->newCategoryName]);
 
             if (!$category instanceof Category) {
-                echo '[*] error! no category found with this id - ' . $data->categoryId, "\n";
+                echo '[*] error! no category found with this name - ' . $data->newCategoryName, "\n";
 
                 return false;
             }
 
-            if (!$book instanceof Book) {
-                echo '[*] error! no book found with this id - ' . $data->bookId, "\n";
-
-                return false;
-            }
-
-            if ($book->category_id === $category->id) {
-                echo '[*] error! This book '  . $book->name . ' already has this category ' . $category->name . ' installed', "\n";
+            if (empty($books)) {
+                echo '[*] error! books not found where category name - ' . $data->oldCategoryName, "\n";
 
                 return false;
             }
             
-            $book->category_id = $category->id;
-            $book->update();
-            echo '[*] success! book - ' . $book->name . ' now category ' . $category->name , "\n";
+            foreach ($books as $book) {
+                if ($book->category_id === $category->id) {
+                    echo '[*] error! This book '  . $book->name . ' already has this category ' . $category->name . ' installed', "\n";
+
+                    return false;
+                } else {
+                    $book->category_id = $category->id;
+                    $book->update();
+                    echo '[*] success! book - ' . $book->name . ' now category ' . $category->name , "\n";
+                }
+            }
 
             return true;
         });

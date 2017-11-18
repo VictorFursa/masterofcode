@@ -53,8 +53,6 @@ class ReplaceBookQueue
     public function consume(callable $callback)
     {
         $this->channel->queue_declare(self::QUEUE_NAME, false, false, false, false);
-
-        echo ' [*] Waiting for messages. To exit press CTRL+C', "\n";
         $this->channel->basic_consume(self::QUEUE_NAME,
             '',
             false,

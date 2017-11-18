@@ -10,5 +10,5 @@ class CategoryFixture extends ActiveFixture
 
     public $dataFile = '@common/data/category.php';
 
-    public $modelClass = '@api\modules\v1\models\Category';
+    public $modelClass = '@common\models\Category';
 }

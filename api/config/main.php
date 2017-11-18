@@ -17,15 +17,6 @@ return [
         ]
     ],
     'components' => [
-        'user' => [
-            'identityClass' => 'common\models\User',
-            'enableAutoLogin' => true,
-            'identityCookie' => ['name' => '_identity-api', 'httpOnly' => true],
-        ],
-        'session' => [
-            // this is the name of the session cookie used for login on the api
-            'name' => 'advanced-api',
-        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -35,9 +26,7 @@ return [
                 ],
             ],
         ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
+        
         'request' => [
             'class' => '\yii\web\Request',
             'enableCookieValidation' => false,
@@ -57,6 +46,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                '' => 'rest/index',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/book'],

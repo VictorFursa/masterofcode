@@ -3,7 +3,7 @@
 namespace api\modules\v1\controllers;
 
 use api\controllers\RestController;
-use api\modules\v1\models\Book;
+use common\models\Book;
 use yii\web\NotFoundHttpException;
 
 class BookController extends RestController
