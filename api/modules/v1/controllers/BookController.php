@@ -4,18 +4,17 @@ namespace api\modules\v1\controllers;
 
 use api\controllers\RestController;
 use common\models\Book;
-use yii\web\NotFoundHttpException;
 
 class BookController extends RestController
 {
     /**
-     * @param string $name
+     * @param string $bookName
      * @return Book[]
      */
-    public function actionSearchByName(string $name)
+    public function actionSearchByName(string $bookName)
     {
         return Book::find()
-            ->where(['like', 'name', $name])
+            ->where(['like', 'name', $bookName])
             ->all();
     }
 
@@ -28,65 +27,40 @@ class BookController extends RestController
     }
 
     /**
-     * @param string $tag
+     * @param string $tagName
      * @return Book[]
      */
-    public function actionSearchByTag(string $tag)
+    public function actionSearchByTag(string $tagName)
     {
         return Book::find()
             ->joinWith('tags')
-            ->where(['tag.name' => explode(',', $tag)])
+            ->where(['tag.name' => explode(',', $tagName)])
             ->all();
     }
 
     /**
-     * @param string $name
-     * @param string $tag
+     * @param string $categoryName
+     * @param string $tagName
      * @return Book[]
      */
-    public function actionSearchByCategoryAndTag(string $name, string $tag)
+    public function actionSearchByCategoryAndTag(string $categoryName, string $tagName)
     {
         return Book::find()
             ->joinWith(['category', 'tags'])
-            ->where(['like', 'tag.name', $tag])
-            ->andWhere(['like', 'category.name', $name])
+            ->where(['like', 'tag.name', $tagName])
+            ->andWhere(['like', 'category.name', $categoryName])
             ->all();
     }
 
     /**
-     * @param string $name
+     * @param string $categoryName
      * @return Book[]
      */
-    public function actionSearchByCategoryName(string $name)
+    public function actionSearchByCategoryName(string $categoryName)
     {
         return Book::find()
             ->joinWith('category')
-            ->where(['like', 'category.name', $name])
+            ->where(['like', 'category.name', $categoryName])
             ->all();
-    }
-
-    /**
-     * @param integer $id
-     * @return Book
-     */
-    public function actionView(int $id)
-    {
-        return $this->findModel($id);
-    }
-
-    /**
-     * Finds the Book model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Book the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel(int $id)
-    {
-        if (($model = Book::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
     }
 }

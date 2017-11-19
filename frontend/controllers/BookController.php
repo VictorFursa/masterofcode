@@ -97,12 +97,23 @@ class BookController extends Controller
     {
         $model = $this->findModel($id);
         $categories = ArrayHelper::map($model->find()->with('category')->all(), 'category.id', 'category.name');
-        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
+        $tags = ArrayHelper::map(Tag::find()->all(), 'id', 'name');
+        if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
+            $book = \Yii::$app->request->post('Book');
+            $tags = Tag::find()->where(['in', 'id', $book['tags']])->all();
+            $model->unlinkAll('tags', true);
+
+            foreach ($tags as $tag) {
+                $model->link('tags', $tag);
+            }
+            $model->update();
+
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
                 'model' => $model,
-                'categories' => $categories
+                'categories' => $categories,
+                'tags' => $tags,
             ]);
         }
     }

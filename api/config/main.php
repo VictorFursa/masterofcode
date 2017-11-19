@@ -52,10 +52,10 @@ return [
                     'controller' => ['v1/book'],
                     'extraPatterns' =>
                         [
-                            'GET <name\w+>' => 'search-by-name',
-                            'GET category/<name\w+>' => 'search-by-category-name',
-                            'GET tag/<tag>' => 'search-by-tag',
-                            'GET category/<name\w+>/tag/<tag\w+>' => 'search-by-category-and-tag',
+                            'GET <bookName\w+>' => 'search-by-name',
+                            'GET category/<categoryName\w+>' => 'search-by-category-name',
+                            'GET tag/<tagName>' => 'search-by-tag',
+                            'GET category/<categoryName\w+>/tag/<tagName\w+>' => 'search-by-category-and-tag',
                         ],
                 ],
             ],
