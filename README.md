@@ -15,7 +15,7 @@ Console commands:
 
 API
 ------------------------------------------
-1. GET /v1/books/tag/{tag} or tag/{tag1,tag2,tag3} - get books by tag / tags
-2. GET /v1/books/category/{categoryName} - get books by category name
-3. GET /v1/books/category/{categoryName}/tag/{tag} - get books by category and tag
-4. GET /v1/books/{bookName} - get books by name
+1. GET `/v1/books/tag/{tag} or /v1/books/tag/{tag1,tag2,tag3}` - get books by tag / tags
+2. GET `/v1/books/category/{categoryName}` - get books by category name
+3. GET `/v1/books/category/{categoryName}/tag/{tag}` - get books by category and tag
+4. GET `/v1/books/{bookName}` - get books by name

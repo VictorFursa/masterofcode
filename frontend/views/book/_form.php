@@ -21,13 +21,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'tags')->widget(Select2::className(), [
         'data' => $tags,
-        'options' => ['placeholder' => 'Select a author ...', 'multiple' => true],
+        'options' => ['placeholder' => 'Select tag ...', 'multiple' => true],
         'pluginOptions' => [
             'tags' => true,
             'tokenSeparators' => [',', ' '],
             'maximumInputLength' => 5
         ],
-    ])->label('Authors');
+    ])->label('Tags');
     ?>
     
     <div class="form-group">

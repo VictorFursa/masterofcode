@@ -70,8 +70,9 @@ class BookController extends Controller
 
         if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
             $model->save();
-            $book = \Yii::$app->request->post('Book');
-            $tags = Tag::find()->where(['in', 'id', $book['tags']])->all();
+            
+            $bookRequest = \Yii::$app->request->post('Book');
+            $tags = Tag::find()->where(['in', 'id', $bookRequest['tags']])->all();
 
             foreach ($tags as $tag) {
                 $model->link('tags', $tag);
@@ -88,7 +89,7 @@ class BookController extends Controller
     }
 
     /**
-     * Updates an existing Book model.
+     * Updates an existing Book model and BookTags.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -99,8 +100,8 @@ class BookController extends Controller
         $categories = ArrayHelper::map($model->find()->with('category')->all(), 'category.id', 'category.name');
         $tags = ArrayHelper::map(Tag::find()->all(), 'id', 'name');
         if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
-            $book = \Yii::$app->request->post('Book');
-            $tags = Tag::find()->where(['in', 'id', $book['tags']])->all();
+            $bookRequest = \Yii::$app->request->post('Book');
+            $tags = Tag::find()->where(['in', 'id', $bookRequest['tags']])->all();
             $model->unlinkAll('tags', true);
 
             foreach ($tags as $tag) {

@@ -5,6 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\Book */
 /* @var $categories \frontend\controllers\BookController */
+/* @var $tags \frontend\controllers\BookController */
 
 $this->title = 'Update Book: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Books', 'url' => ['index']];
