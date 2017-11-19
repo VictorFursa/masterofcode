@@ -6,19 +6,18 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-class ReplaceBookQueue
+class RabbitMQ
 {
-    const QUEUE_NAME = 'replace_book_queue';
-
     /** @var AMQPChannel */
     private $channel;
     /** @var AMQPStreamConnection  */
     private $connection;
-
-    public function __construct()
+    /** @var  $uniqueQueueName string */
+    private $uniqueQueueName;
+    
+    public function __construct(array $config, string $uniqueQueueName)
     {
-        $config = \Yii::$app->params['amqp'];
-
+        $this->uniqueQueueName = $uniqueQueueName;
         $this->connection = new AMQPStreamConnection(
             $config['host'],
             $config['port'],
@@ -34,13 +33,15 @@ class ReplaceBookQueue
      */
     public function publisher(array $data)
     {
-        $this->channel->queue_declare(self::QUEUE_NAME, false, false, false, false);
+        $this->channel->queue_declare($this->uniqueQueueName, false, false, false, false);
 
         $amqpMessage = new AMQPMessage(json_encode($data), [
             'content_type' => 'application/json',
+            "timestamp" => (new \DateTime())->getTimestamp(),
             'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT
         ]);
-        $this->channel->basic_publish($amqpMessage, '', self::QUEUE_NAME);
+        $this->channel->basic_publish($amqpMessage, '', $this->uniqueQueueName);
+      
         echo " [x] Successful sending\n";
 
         $this->channel->close();
@@ -52,8 +53,8 @@ class ReplaceBookQueue
      */
     public function consume(callable $callback)
     {
-        $this->channel->queue_declare(self::QUEUE_NAME, false, false, false, false);
-        $this->channel->basic_consume(self::QUEUE_NAME,
+        $this->channel->queue_declare($this->uniqueQueueName, false, false, false, false);
+        $this->channel->basic_consume($this->uniqueQueueName,
             '',
             false,
             true,

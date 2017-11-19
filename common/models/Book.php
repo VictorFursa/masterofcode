@@ -42,9 +42,9 @@ class Book extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
             'name' => 'Name',
-            'category_id' => 'Category ID',
+            'categoryName' => 'Category Name',
+            'tagName' => 'Tag Name'
         ];
     }
 
@@ -63,4 +63,20 @@ class Book extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Tag::className(), ['id' => 'tag_id'])->viaTable('book_tag', ['book_id' => 'id']);
     }
+
+    public function getCategoryName()
+    {
+        $category = $this->category;
+
+        return $category ? $category->name : '';
+    }
+
+    public function getTagName()
+    {
+        foreach ($this->tags as $tag) {
+            return $tag->name;
+        }
+        return '';
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\components\RabbitMQ;
 use common\models\Book;
 use common\models\Category;
 use common\models\Tag;
@@ -49,19 +50,23 @@ class BookController extends Controller
      */
     public function actionReplace(string $oldCategoryName, string $newCategoryName)
     {
-        \Yii::$app->replaceBookQueue->publisher(['oldCategoryName' => $oldCategoryName, 'newCategoryName' => $newCategoryName]);
+        \Yii::$container
+            ->get(RabbitMQ::class, [\Yii::$app->params['amqp'], 'replace_book_queue'])
+            ->publisher(['oldCategoryName' => $oldCategoryName, 'newCategoryName' => $newCategoryName]);
     }
 
     public function actionConsumeReplace()
     {
-        \Yii::$app->replaceBookQueue->consume(function (AMQPMessage $message) {
+        \Yii::$container
+            ->get(RabbitMQ::class, [\Yii::$app->params['amqp'], 'replace_book_queue'])
+            ->consume(function (AMQPMessage $message) {
             $data = json_decode($message->body);
-
             if (!is_object($data) || !isset($data->oldCategoryName) || !isset($data->newCategoryName)) {
-                echo '[*] something wrong look at line 60 in console/controllers/BookController ', "\n";
+                echo 'timestamp ' . $message->get('timestamp') . '[*] something wrong look at line 60 in console/controllers/BookController ', "\n";
                 
                 return false;
             }
+                
             /** @var  $books Book[] */
             $books = Book::find()
                 ->joinWith('category')
@@ -70,26 +75,26 @@ class BookController extends Controller
             $category = Category::findOne(['name' => $data->newCategoryName]);
 
             if (!$category instanceof Category) {
-                echo '[*] error! no category found with this name - ' . $data->newCategoryName, "\n";
+                echo 'timestamp ' . $message->get('timestamp') . '[*] error! no category found with this name - ' . $data->newCategoryName, "\n";
 
                 return false;
             }
 
             if (empty($books)) {
-                echo '[*] error! books not found where category name - ' . $data->oldCategoryName, "\n";
+                echo 'timestamp ' . $message->get('timestamp') . '[*] error! books not found where category name - ' . $data->oldCategoryName, "\n";
 
                 return false;
             }
             
             foreach ($books as $book) {
                 if ($book->category_id === $category->id) {
-                    echo '[*] error! This book '  . $book->name . ' already has this category ' . $category->name . ' installed', "\n";
+                    echo 'timestamp ' . $message->get('timestamp') . '[*] error! This book '  . $book->name . ' already has this category ' . $category->name . ' installed', "\n";
 
                     return false;
                 } else {
                     $book->category_id = $category->id;
                     $book->update();
-                    echo '[*] success! book - ' . $book->name . ' now category ' . $category->name , "\n";
+                    echo 'timestamp ' . $message->get('timestamp') . '[*] success! book - ' . $book->name . ' now category ' . $category->name , "\n";
                 }
             }
 
