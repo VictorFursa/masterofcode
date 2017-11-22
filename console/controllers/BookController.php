@@ -11,24 +11,7 @@ use yii\console\Controller;
 
 class BookController extends Controller
 {
-    /**
-     * @param string $categoryName
-     * @throws \Exception
-     * @throws \Throwable
-     */
-    public function actionRemoveByCategoryName(string $categoryName)
-    {
-        $category = Category::findOne(['name' => $categoryName]);
-
-        if ($category instanceof Category) {
-            Book::deleteAll(['category_id' => $category->id]);
-            $category->delete();
-            $this->stdout("Removed all books and category. Where category name:'$categoryName' " . PHP_EOL);
-        } else {
-            $this->stdout('nothing delete' . PHP_EOL);
-        }
-    }
-
+    
     /**
      * @param string $tagName
      */
@@ -40,11 +23,13 @@ class BookController extends Controller
             $tag->unlinkAll('books', true);
             $this->stdout('done!' . PHP_EOL);
         } else {
-            $this->stdout('nothing delete' . PHP_EOL);
+            $this->stdout('nothing to delete' . PHP_EOL);
         }
     }
 
     /**
+     * Replace category names for books
+     * using RabbitMQ
      * @param string $oldCategoryName
      * @param string $newCategoryName
      */
@@ -54,7 +39,10 @@ class BookController extends Controller
             ->get(RabbitMQ::class, [\Yii::$app->params['amqp'], 'replace_book_queue'])
             ->publisher(['oldCategoryName' => $oldCategoryName, 'newCategoryName' => $newCategoryName]);
     }
-
+    
+    /**
+     * Prints the queue
+     */
     public function actionConsumeReplace()
     {
         \Yii::$container
