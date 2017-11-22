@@ -33,3 +33,6 @@ phpunit.phar
 
 # vagrant runtime
 /.vagrant
+/.php_cs.cache
+Будет удалено .php_cs.cache
+Будет удалено api/tests/fixtures/
